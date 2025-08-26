@@ -6,7 +6,7 @@ import permissionRouter from './src/routes/permissionRoutes.js'
 import userRouter from './src/routes/userRoutes.js'
 import roleRouter from './src/routes/roleRoutes.js'
 import dotenv from 'dotenv'
-import gameRouter from "./src/routes/GamesRoutes.js"
+import gameRouter from './src/routes/gamesRoutes.js'
 import favoriteRouter from './src/routes/favoriteRoutes.js'
 
 // Iniciar el env
