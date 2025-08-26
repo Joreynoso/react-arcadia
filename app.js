@@ -54,7 +54,7 @@ app.use("/api/games", gameRouter)
 app.use("/api/favorites", favoriteRouter)
 
 // Ruta principal
-app.get("/api", (req, res) => {
+app.get("/api/health", (req, res) => {
   res.json({ mesage: "server running" })
 })
 
