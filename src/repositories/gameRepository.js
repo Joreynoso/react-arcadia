@@ -9,6 +9,14 @@ class GameRepository {
     )
   }
 
+  async updateSummary(id, summary) {
+    return VideoGame.findByIdAndUpdate(
+      id,
+      { summary },
+      { new: true } 
+    )
+  }
+
   async getAll() {
     return VideoGame.find({})
   }

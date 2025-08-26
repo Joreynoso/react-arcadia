@@ -1,6 +1,7 @@
 import gameRepository from '../repositories/gameRepository.js'
 import GameRepository from "../repositories/gameRepository.js"
 import { fetchExternalGames } from "../services/gameFetch.js"
+import { getSummaryFromAi } from './genAiService.js'
 import mongoose from 'mongoose'
 
 class GameService {
@@ -32,6 +33,27 @@ class GameService {
 
     console.log(`Se cargaron ${allGames.length} juegos en la base de datos`)
     return allGames.length
+  }
+
+  // --> genearr descripción con google gen ai
+  async generateSummary(id) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new Error('Id no valido')
+    }
+
+    const game = await GameRepository.getById(id)
+    if (!game) throw new Error('Juego no encontrado')
+
+    // Solo generamos si summary está vacío
+    if (!game.summary) {
+      const summary = await getSummaryFromAi({ name: game.name, released: game.released })
+      if (summary) {
+        return GameRepository.updateSummary(id, summary)
+      }
+    }
+
+    // Si ya tiene summary, devolvemos el juego tal cual
+    return game
   }
 
   // --> mostrar la lista de juegos

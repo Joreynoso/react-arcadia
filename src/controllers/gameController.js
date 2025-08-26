@@ -19,6 +19,23 @@ class GameController {
     }
   }
 
+  // --> generar descripción con ia
+  async generateSummary(req, res) {
+    try {
+      const { id } = req.params
+      const game = await gameService.generateSummary(id)
+
+      if (!game) {
+        return res.status(404).json({ success: false, message: "Juego no encontrado" })
+      }
+
+      res.status(200).json({ succes: true, message: "Sumario creado", sumary: game })
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ success: false, message: error.message })
+    }
+  }
+
   // --> lista de juegos
   async getAll(req, res) {
     try {
