@@ -50,7 +50,3 @@ dump/
 dist/
 build/
 
-# Optional: lock files (si no querés versionarlos)
-package-lock.json
-yarn.lock
-pnpm-lock.yaml

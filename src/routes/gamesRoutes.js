@@ -42,6 +42,8 @@ gameRouter.post("/",
 gameRouter.put("/:id",
     authenticateToken,
     hasPermission('update:game'),
+    gameValidator,
+    handleValidationError,
     gameController.update)
 
 gameRouter.delete("/:id",
