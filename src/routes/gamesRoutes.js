@@ -2,7 +2,7 @@ import express from "express"
 import gameController from "../controllers/gameController.js"
 import { authenticateToken, hasPermission } from "../middlewares/authMiddleware.js"
 import { handleValidationError } from "../middlewares/handleValidationsError.js"
-import { gameValidator } from "../validations/videogameValidator.js"
+import { gameValidator, paginationValidator, searchValidator } from "../validations/videogameValidator.js"
 
 // instanciar router
 const gameRouter = express.Router()
@@ -11,6 +11,8 @@ const gameRouter = express.Router()
 gameRouter.get("/",
     authenticateToken,
     hasPermission('read:games'),
+    paginationValidator,
+    handleValidationError,
     gameController.getAll)
 
 gameRouter.post("/load",
@@ -25,7 +27,9 @@ gameRouter.post("/summary/:id",
 gameRouter.get("/search",
     authenticateToken,
     hasPermission('read:games'),
-    gameController.getByName)
+    searchValidator,
+    handleValidationError,
+    gameController.search)
 
 gameRouter.get("/:id",
     authenticateToken,

@@ -1,7 +1,7 @@
 import gameService from "../services/gameService.js"
 
 class GameController {
-  constructor() { }
+  constructor() {}
 
   // --> cargar todos los juegos
   async loadGames(req, res) {
@@ -39,13 +39,23 @@ class GameController {
   // --> lista de juegos
   async getAll(req, res) {
     try {
-      const listGames = await gameService.getAllGames()
+      const { page = 1, limit = 10 } = req.query // valores por defecto
 
-      if (!listGames || listGames.length === 0) {
+      const { games, total } = await gameService.getAllGames(page, limit)
+
+      if (!games || games.length === 0) {
         return res.status(404).json({ succes: false, message: "No hay juegos" })
       }
 
-      res.status(200).json({ succes: true, message: "Lista de juegos", listGames, count: listGames.length })
+      res.status(200).json({
+        succes: true,
+        message: "Lista de juegos",
+        page: Number(page), // --> pág actual convertida a num
+        total, // --> total juegos
+        totalPages: Math.ceil(total / limit), // --> total juegos posibles x pág
+        count: games.length,
+        games,
+      })
     } catch (error) {
       console.error(error.message)
       return res.status(500).json({ succes: false, message: error.message })
@@ -60,7 +70,7 @@ class GameController {
       const gameExist = await gameService.getGameById(id)
 
       if (!gameExist) {
-        return res.status(404).json({ succes: false, message: 'Juego no encontrado' })
+        return res.status(404).json({ succes: false, message: "Juego no encontrado" })
       }
 
       res.status(200).json({ succes: true, message: "Juego encontrado", game: gameExist })
@@ -71,25 +81,33 @@ class GameController {
   }
 
   // --> buscar un juego por nombre
-  async getByName(req, res) {
+  async search(req, res) {
+
+    const { q } = req.query
+    const page = parseInt(req.query.page, 10) || 1
+    const limit = parseInt(req.query.limit, 10) || 25
+
     try {
-      const { name } = req.query  // aquí sí usamos query
-      if (!name) {
-        return res.status(400).json({ succes: false, message: "Debes pasar un nombre a buscar" })
+      const { games, total } = await gameService.searchGames(q, page, limit)
+
+      if (!games || games.length === 0) {
+        return res.status(404).json({ succes: false, message: "No se encontraron juegos" })
       }
 
-      const game = await gameService.getGameByName(name)
-      if (!game) {
-        return res.status(404).json({ succes: false, message: "Juego no encontrado" })
-      }
-
-      res.status(200).json({ succes: true, message: "Juego encontrado", game })
+      res.status(200).json({
+        succes: true,
+        message: `Resultados de búsqueda para "${q}"`,
+        page,
+        total,
+        totalPages: Math.ceil(total / limit),
+        count: games.length,
+        games,
+      })
     } catch (error) {
       console.error(error.message)
       return res.status(500).json({ succes: false, message: error.message })
     }
   }
-
 
   // --> crear un nuevo juego
   async create(req, res) {
@@ -100,7 +118,7 @@ class GameController {
       const gameExist = await gameService.getGameByName(name)
 
       if (gameExist) {
-        return res.status(400).json({ succes: false, message: 'El juego ya existe' })
+        return res.status(400).json({ succes: false, message: "El juego ya existe" })
       }
 
       const newGame = await gameService.createGame(gameData)
@@ -118,11 +136,11 @@ class GameController {
       const { id } = req.params
       const gameData = req.body
 
-      console.log('cuerpo de la solicitud', gameData)
+      console.log("cuerpo de la solicitud", gameData)
       const gameUpdated = await gameService.updateGame(id, gameData)
 
       if (!gameUpdated) {
-        return res.status(404).json({ succes: false, message: 'Juego no encontrado' })
+        return res.status(404).json({ succes: false, message: "Juego no encontrado" })
       }
 
       res.status(200).json({ succes: true, message: "Juego actualizado", game: gameUpdated })
@@ -140,7 +158,7 @@ class GameController {
       const gameDeleted = await gameService.deleteGame(id)
 
       if (!gameDeleted) {
-        return res.status(404).json({ succes: false, message: 'Juego no encontrado' })
+        return res.status(404).json({ succes: false, message: "Juego no encontrado" })
       }
 
       res.status(200).json({ succes: true, message: "Juego eliminado", game: gameDeleted })

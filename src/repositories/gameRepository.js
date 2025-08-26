@@ -10,15 +10,16 @@ class GameRepository {
   }
 
   async updateSummary(id, summary) {
-    return VideoGame.findByIdAndUpdate(
-      id,
-      { summary },
-      { new: true } 
-    )
+    return VideoGame.findByIdAndUpdate(id, { summary }, { new: true })
   }
 
-  async getAll() {
-    return VideoGame.find({})
+  async getAll(page, limit) {
+    const skip = (page - 1) * limit
+    const games = await VideoGame.find({}).skip(skip).limit(limit)
+
+    const total = await VideoGame.countDocuments({})
+
+    return { games, total }
   }
 
   async getById(id) {
@@ -29,8 +30,17 @@ class GameRepository {
     return VideoGame.findOne({ id_rawg })
   }
 
-  async getByName(name) {
-    return VideoGame.findOne({ name })
+  async search(q, page, limit) {
+    const skip = (page - 1) * limit
+
+    // Búsqueda case-insensitive por nombre
+    const query = { name: { $regex: q, $options: "i" } }
+
+    const games = await VideoGame.find(query).skip(skip).limit(limit)
+
+    const total = await VideoGame.countDocuments(query)
+
+    return { games, total }
   }
 
   async create(data) {

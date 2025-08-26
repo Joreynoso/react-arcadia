@@ -1,8 +1,8 @@
-import gameRepository from '../repositories/gameRepository.js'
+import gameRepository from "../repositories/gameRepository.js"
 import GameRepository from "../repositories/gameRepository.js"
 import { fetchExternalGames } from "../services/gameFetch.js"
-import { getSummaryFromAi } from './genAiService.js'
-import mongoose from 'mongoose'
+import { getSummaryFromAi } from "./genAiService.js"
+import mongoose from "mongoose"
 
 class GameService {
   MAX_GAMES = 500
@@ -38,11 +38,11 @@ class GameService {
   // --> genearr descripción con google gen ai
   async generateSummary(id) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new Error('Id no valido')
+      throw new Error("Id no valido")
     }
 
     const game = await GameRepository.getById(id)
-    if (!game) throw new Error('Juego no encontrado')
+    if (!game) throw new Error("Juego no encontrado")
 
     // Solo generamos si summary está vacío
     if (!game.summary) {
@@ -57,24 +57,22 @@ class GameService {
   }
 
   // --> mostrar la lista de juegos
-  async getAllGames() {
-    return GameRepository.getAll()
+  async getAllGames(page, limit) {
+    return GameRepository.getAll(page, limit)
   }
 
   // --> buscar un juego por id
   async getGameById(id) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new Error('El id no es valido')
+      throw new Error("El id no es valido")
     }
 
     const game = await GameRepository.getById(id)
     return game
   }
 
-  // --> buscar un juego por id
-  async getGameByName(name) {
-    const game = await GameRepository.getByName(name)
-    return game
+  async searchGames(q, page, limit) {
+    return GameRepository.search(q, page, limit)
   }
 
   // --> crear un nuevo juego
@@ -83,14 +81,14 @@ class GameService {
     if (data.id_rawg) {
       const existing = await GameRepository.getByRawgId(data.id_rawg)
       if (existing) {
-        throw new Error('El juego con ese id_rawg ya existe')
+        throw new Error("El juego con ese id_rawg ya existe")
       }
     }
 
     const gameExist = await gameRepository.getByName(data.name)
 
     if (gameExist) {
-      throw new Error('El juego con ese nombre ya existe')
+      throw new Error("El juego con ese nombre ya existe")
     }
 
     // crear juego nuevo
@@ -104,7 +102,7 @@ class GameService {
     console.log(gameUpdated)
 
     if (!gameUpdated) {
-      throw new Error('El juego que intentas actualizar no existe')
+      throw new Error("El juego que intentas actualizar no existe")
     }
 
     return gameUpdated
@@ -113,7 +111,7 @@ class GameService {
   // --> eliminar un juego
   async deleteGame(id) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new Error('El id no es valido')
+      throw new Error("El id no es valido")
     }
 
     const game = await GameRepository.delete(id)
