@@ -14,7 +14,7 @@ dotenv.config()
 
 // Instanciar Express
 const app = express()
-const port = process.env.PORT || 3000
+const port = process.env.PORT
 
 // cors options
 const corsOptions = {
@@ -60,5 +60,5 @@ app.get("/api/health", (req, res) => {
 
 // Iniciar servidor
 app.listen(port, () => {
-  console.log(`--> [SERVER] http://localhost:${port}`)
+  console.log(`--> conectado a mongo db ${port}`)
 })
