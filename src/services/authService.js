@@ -10,52 +10,51 @@ class AuthService {
 
   // --> Registrar un nuevo usuario
   async register(userData) {
-    // 1. Validar existencia de usuario
-    console.log('entrando a la función...')
+    // Revisamos si ya existe un usuario con el mismo email o username
     const userExisting = await userModel.findOne({
       $or: [{ email: userData.email }, { username: userData.username }],
     })
+
+    // Si existe, lanzamos un error para que no se duplique
     if (userExisting) {
       throw new Error("El usuario ya existe")
     }
 
-    // 2. Hashear contraseña
+    // Encriptamos la contraseña usando bcrypt antes de guardarla
+    // El número 10 indica la cantidad de "salt rounds" para la encriptación
     const hashedPassword = await bcrypt.hash(userData.password, 10)
 
-    // 3. Obtener rol por defecto
-    const defaultRole = await Role.findOne({ name: 'user' }).populate('permissions')
+    // Definir un rol por defecto
+    const defaultRole = await Role.findOne({ name: 'user' })
+
+    // validar
     if (!defaultRole) throw new Error("Rol por defecto no encontrado")
 
-    // 4. Crear usuario
+    // Creamos una nueva instancia del modelo User con los datos recibidos
+    // Reemplazamos la contraseña original por la versión encriptada
     const newUser = new userModel({
       ...userData,
       password: hashedPassword,
       role: defaultRole._id
     })
+
+    // Guardamos el nuevo usuario en la base de datos
     await newUser.save()
+    console.log("Usuario guardado:", newUser)
 
-    console.log('new user saved', newUser)
+    // Convertimos el documento de Mongoose a un objeto plano (POJO)
+    const newUserResponse = newUser.toObject()
 
-    // 5. Recuperar usuario ya poblado con rol + permisos
-    const populatedUser = await userModel.findById(newUser._id).populate({
-      path: 'role',
-      populate: { path: 'permissions' }
-    })
+    // Eliminamos la contraseña para no exponerla en la respuesta
+    delete newUserResponse.password
 
-    console.log('populate permissions', populatedUser)
+    // Generamos un token JWT para autenticación futura
+    const token = this.generateToken(newUser)
 
-    // 6. Preparar respuesta segura
-    const userResponse = populatedUser.toObject()
-    delete userResponse.password
-
-    console.log('user response', userResponse)
-
-    // 7. Generar token
-    const token = this.generateToken(populatedUser)
-
+    // Retornamos la información del usuario y el token
     return {
-      user: userResponse,
-      token
+      user: newUserResponse,
+      token,
     }
   }
 
@@ -74,35 +73,36 @@ class AuthService {
     )
   }
 
+
   // --> Login de un usuario
   async login(email, password) {
+    // Buscamos al usuario por su email en la base de datos
+    const user = await userModel.findOne({ email })
 
-    // 1. Buscar usuario y poblar rol + permisos
-    const user = await userModel.findOne({ email }).populate({
-      path: 'role',
-      populate: { path: 'permissions' }
-    })
-
+    // Si el usuario no existe, lanzamos un error para que el controlador lo maneje
     if (!user) {
       throw new Error("El usuario no existe")
     }
 
-    console.log('usuario creado', user)
-
-    // 2. Verificar contraseña
+    // Verificamos la contraseña
+    // Comparamos el password enviado en la petición con el hash almacenado en la base de datos
     const isValidPassword = await bcrypt.compare(password, user.password)
+
+    // Si la contraseña no coincide, lanzamos un error
     if (!isValidPassword) {
       throw new Error("Correo o contraseña incorrecta")
     }
 
-    // 3. Preparar respuesta segura
+    // Convertimos el documento Mongoose a un objeto plano (POJO)
     const userResponse = user.toObject()
+
+    // Eliminamos la contraseña para no exponerla en la respuesta
     delete userResponse.password
 
-    // 4. Generar token con usuario poblado
+    // Generamos un token JWT para autenticar al usuario en futuras peticiones
     const token = this.generateToken(user)
 
-    // 5. Retornar usuario + rol con permisos
+    // Retornamos la información del usuario y el token
     return {
       user: userResponse,
       token
