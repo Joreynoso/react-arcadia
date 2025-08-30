@@ -87,12 +87,13 @@ class AuthService {
       throw new Error("El usuario no existe")
     }
 
+    console.log('usuario creado', user)
+
     // 2. Verificar contraseña
     const isValidPassword = await bcrypt.compare(password, user.password)
     if (!isValidPassword) {
       throw new Error("Correo o contraseña incorrecta")
     }
-
 
     // 3. Preparar respuesta segura
     const userResponse = user.toObject()
