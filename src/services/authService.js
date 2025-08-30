@@ -10,51 +10,52 @@ class AuthService {
 
   // --> Registrar un nuevo usuario
   async register(userData) {
-    // Revisamos si ya existe un usuario con el mismo email o username
+    // 1. Validar existencia de usuario
+    console.log('entrando a la función...')
     const userExisting = await userModel.findOne({
       $or: [{ email: userData.email }, { username: userData.username }],
     })
-
-    // Si existe, lanzamos un error para que no se duplique
     if (userExisting) {
       throw new Error("El usuario ya existe")
     }
 
-    // Encriptamos la contraseña usando bcrypt antes de guardarla
-    // El número 10 indica la cantidad de "salt rounds" para la encriptación
+    // 2. Hashear contraseña
     const hashedPassword = await bcrypt.hash(userData.password, 10)
 
-    // Definir un rol por defecto
-    const defaultRole = await Role.findOne({ name: 'user' })
-
-    // validar
+    // 3. Obtener rol por defecto
+    const defaultRole = await Role.findOne({ name: 'user' }).populate('permissions')
     if (!defaultRole) throw new Error("Rol por defecto no encontrado")
 
-    // Creamos una nueva instancia del modelo User con los datos recibidos
-    // Reemplazamos la contraseña original por la versión encriptada
+    // 4. Crear usuario
     const newUser = new userModel({
       ...userData,
       password: hashedPassword,
       role: defaultRole._id
     })
-
-    // Guardamos el nuevo usuario en la base de datos
     await newUser.save()
-    console.log("Usuario guardado:", newUser)
 
-    // Convertimos el documento de Mongoose a un objeto plano (POJO)
-    const newUserResponse = newUser.toObject()
+    console.log('new user saved', newUser)
 
-    // Eliminamos la contraseña para no exponerla en la respuesta
-    delete newUserResponse.password
+    // 5. Recuperar usuario ya poblado con rol + permisos
+    const populatedUser = await userModel.findById(newUser._id).populate({
+      path: 'role',
+      populate: { path: 'permissions' }
+    })
 
-    // Generamos un token JWT para autenticación futura
-    const token = this.generateToken(newUser)
+    console.log('populate permissions', populatedUser)
 
-    // Retornamos la información del usuario y el token
+    // 6. Preparar respuesta segura
+    const userResponse = populatedUser.toObject()
+    delete userResponse.password
+
+    console.log('user response', userResponse)
+
+    // 7. Generar token
+    const token = this.generateToken(populatedUser)
+
     return {
-      user: newUserResponse,
-      token,
+      user: userResponse,
+      token
     }
   }
 
@@ -75,39 +76,37 @@ class AuthService {
 
   // --> Login de un usuario
   async login(email, password) {
-    // Buscamos al usuario por su email en la base de datos
-    const user = await userModel.findOne({ email })
 
-    // Si el usuario no existe, lanzamos un error para que el controlador lo maneje
+    // 1. Buscar usuario y poblar rol + permisos
+    const user = await userModel.findOne({ email }).populate({
+      path: 'role',
+      populate: { path: 'permissions' }
+    })
+
     if (!user) {
       throw new Error("El usuario no existe")
     }
 
-    // Verificamos la contraseña
-    // Comparamos el password enviado en la petición con el hash almacenado en la base de datos
+    // 2. Verificar contraseña
     const isValidPassword = await bcrypt.compare(password, user.password)
-
-    // Si la contraseña no coincide, lanzamos un error
     if (!isValidPassword) {
       throw new Error("Correo o contraseña incorrecta")
     }
 
-    // Convertimos el documento Mongoose a un objeto plano (POJO)
-    const userResponse = user.toObject()
 
-    // Eliminamos la contraseña para no exponerla en la respuesta
+    // 3. Preparar respuesta segura
+    const userResponse = user.toObject()
     delete userResponse.password
 
-    // Generamos un token JWT para autenticar al usuario en futuras peticiones
+    // 4. Generar token con usuario poblado
     const token = this.generateToken(user)
 
-    // Retornamos la información del usuario y el token
+    // 5. Retornar usuario + rol con permisos
     return {
       user: userResponse,
       token
     }
   }
-
 }
 
 export default new AuthService
