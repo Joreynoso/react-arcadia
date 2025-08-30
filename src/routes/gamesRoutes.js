@@ -16,6 +16,9 @@ gameRouter.get("/",
     gameController.getAll)
 
 gameRouter.post("/load",
+    authenticateToken,
+    authenticateToken,
+    hasPermission("load:games"),
     gameController.loadGames)
 
 gameRouter.post("/summary/:id",
