@@ -28,14 +28,23 @@ class FavoriteController {
             const listOfFavorites = await FavoriteService.getFavorites(req.user.id)
 
             if (!listOfFavorites || listOfFavorites.length === 0) {
-                return res.status(404).json({ success: false, error: 'No se encontraron favoritos' })
+                return res.status(200).json({
+                    success: true,
+                    message: 'No se encontraron favoritos',
+                    favorites: []
+                })
             }
 
-            res.status(200).json({ succes: true, message: "Lista de favoritos", favorites: listOfFavorites })
+            res.status(200).json({
+                success: true,
+                message: 'Lista de favoritos',
+                favorites: listOfFavorites
+            })
         } catch (error) {
-            res.status(500).json({ succes: false, message: error.message })
+            res.status(500).json({ success: false, message: error.message })
         }
     }
+
 
     // eliminar un juego de favoritos
     async removeFavorite(req, res) {
