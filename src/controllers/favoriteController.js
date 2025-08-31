@@ -14,7 +14,6 @@ class FavoriteController {
                 return res.status(200).json({
                     success: true,
                     message: 'El juego ya está en favoritos',
-                    favorite: existing
                 })
             }
 
