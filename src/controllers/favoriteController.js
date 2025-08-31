@@ -61,17 +61,22 @@ class FavoriteController {
     // eliminar un juego de favoritos
     async removeFavorite(req, res) {
         try {
-            const { userid, gameid } = req.body
+            const { gameid } = req.body
+            const userid = req.user.id  // ✅ tomar id del token
+
+            if (!gameid) {
+                return res.status(400).json({ success: false, message: 'El campo gameid es obligatorio' })
+            }
 
             const gamedeleted = await FavoriteService.removeFavorite(userid, gameid)
 
             if (!gamedeleted) {
-                return res.status(404).json({ success: false, error: 'Favorito no encontrado' })
+                return res.status(404).json({ success: false, message: 'Favorito no encontrado' })
             }
 
-            res.status(200).json({ succes: true, message: "Juego eliminado de favoritos", game: gamedeleted })
+            res.status(200).json({ success: true, message: "Juego eliminado de favoritos", game: gamedeleted })
         } catch (error) {
-            res.status(400).json({ succes: false, message: error.message })
+            res.status(400).json({ success: false, message: error.message })
         }
     }
 }
