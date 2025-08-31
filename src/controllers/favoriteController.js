@@ -4,18 +4,33 @@ class FavoriteController {
     // agregar un juego a favoritos
     async addFavorite(req, res) {
         try {
-            console.log('1. entrando al controlador...')
-            const { userid, gameid } = req.body
-            const favorite = await FavoriteService.addFavorite(userid, gameid)
+            console.log('1. entrando a addFavorite')
+            console.log('2. id del middleware', req.user.id)
 
-            console.log('2. cuerpo solicitud', userid + gameid)
+            const { gameid } = req.body   // solo recibimos el id del juego
 
-            if (!favorite) {
-                return res.status(404).json({ success: false, error: 'Juego o usuario no encontrado' })
+            if (!gameid) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'El campo gameid es obligatorio'
+                })
             }
-            res.status(201).json({ succes: true, message: "Juego agregado a favoritos", game: favorite })
+
+            // usamos el id del usuario desde el token
+            const newFavorite = await FavoriteService.addFavorite({
+                userid: req.user.id,
+                gameid
+            })
+
+            res.status(201).json({
+                success: true,
+                message: 'Juego agregado a favoritos',
+                favorite: newFavorite
+            })
+            
         } catch (error) {
-            res.status(400).json({ succes: false, message: error.message })
+            console.error('Error en addFavorite:', error)
+            res.status(500).json({ success: false, message: error.message })
         }
     }
 
