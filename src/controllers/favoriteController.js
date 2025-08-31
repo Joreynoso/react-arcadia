@@ -2,30 +2,38 @@ import FavoriteService from "../services/favoriteService.js"
 
 class FavoriteController {
     // agregar un juego a favoritos
+    // FavoriteController.js
     async addFavorite(req, res) {
         try {
             const { gameid } = req.body
-            const userId = req.user.id
+            const userId = req.user.id  // usar ID del token
 
-            // comprobar si ya existe
-            const existing = await FavoriteService.getFavorites(userId, gameid)
-
-            if (existing) {
-                return res.status(200).json({
-                    success: true,
-                    message: 'El juego ya está en favoritos',
+            if (!gameid) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'El campo gameid es obligatorio'
                 })
             }
 
-            // si no existe, lo agrega
             const newFavorite = await FavoriteService.addFavorite(userId, gameid)
 
+            if (!newFavorite) {
+                // ya estaba en favoritos
+                return res.status(200).json({
+                    success: true,
+                    message: 'El juego ya está en favoritos'
+                })
+            }
+
+            // se agregó un nuevo favorito
             res.status(201).json({
                 success: true,
                 message: 'Juego agregado a favoritos',
                 favorite: newFavorite
             })
+
         } catch (error) {
+            console.error('Error en addFavorite:', error)
             res.status(500).json({ success: false, message: error.message })
         }
     }

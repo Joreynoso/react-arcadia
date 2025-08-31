@@ -2,23 +2,26 @@ import FavoriteRepository from '../repositories/favoriteRepository.js'
 import mongoose from 'mongoose'
 
 class FavoriteGameService {
-    // agregar un juego a favoritos
+    // Fagregar un juego a favoritosF
     async addFavorite(userId, gameId) {
-        if (!mongoose.Types.ObjectId.isValid(gameId)) {
-            throw new Error('ID del juego invalido')
-        }
-
         if (!mongoose.Types.ObjectId.isValid(userId)) {
-            throw new Error('ID del usuario invalido')
+            throw new Error('ID de usuario inválido')
+        }
+        if (!mongoose.Types.ObjectId.isValid(gameId)) {
+            throw new Error('ID del juego inválido')
         }
 
-        const existing = await FavoriteRepository.getFavorite(userId, gameId)
+        // 🔹 Verificar si ya existe
+        const existing = await FavoriteRepository.existsFavorite(userId, gameId)
         if (existing) {
-            throw new Error("El juego ya está en favoritos")
+            // devolver null si ya existe
+            return null
         }
 
+        // si no existe, agregar
         return FavoriteRepository.addFavorite(userId, gameId)
     }
+
 
     // eliminar un juego de favoritos
     async removeFavorite(userId, gameId) {
@@ -34,7 +37,7 @@ class FavoriteGameService {
         if (!mongoose.Types.ObjectId.isValid(userId)) {
             throw new Error("No se encontró el usuario")
         }
-        
+
         const favoritesListUser = await FavoriteRepository.getFavoritesByUser(userId)
 
         return favoritesListUser

@@ -10,6 +10,10 @@ class FavoriteGameRepository {
         return FavoriteGame.findOneAndDelete({ user: userId, game: gameId })
     }
 
+    async existsFavorite(userId, gameId) {
+        return FavoriteGame.findOne({ user: userId, game: gameId })
+    }
+
     async getFavoritesByUser(userId) {
         return FavoriteGame.find({ user: userId }).populate({
             path: 'game',
