@@ -4,10 +4,8 @@ class FavoriteController {
     // agregar un juego a favoritos
     async addFavorite(req, res) {
         try {
-            console.log('1. entrando a addFavorite')
-            console.log('2. id del middleware', req.user.id)
-
-            const { gameid } = req.body   // solo recibimos el id del juego
+            const { gameid } = req.body
+            const userId = req.user.id  // sacado del token
 
             if (!gameid) {
                 return res.status(400).json({
@@ -16,18 +14,14 @@ class FavoriteController {
                 })
             }
 
-            // usamos el id del usuario desde el token
-            const newFavorite = await FavoriteService.addFavorite({
-                userid: req.user.id,
-                gameid
-            })
+            const newFavorite = await FavoriteService.addFavorite(userId, gameid)
 
             res.status(201).json({
                 success: true,
                 message: 'Juego agregado a favoritos',
                 favorite: newFavorite
             })
-            
+
         } catch (error) {
             console.error('Error en addFavorite:', error)
             res.status(500).json({ success: false, message: error.message })
