@@ -23,16 +23,19 @@ class GameController {
   async generateSummary(req, res) {
     try {
       const { id } = req.params
-      const game = await gameService.generateSummary(id)
+      const result = await gameService.generateSummary(id)
 
-      if (!game) {
+      if (!result) {
         return res.status(404).json({ success: false, message: "Juego no encontrado" })
       }
 
-      res.status(200).json({ succes: true, message: "Sumario creado", sumary: game })
+      return res.status(200).json({
+        success: true,
+        ...result,
+      })
     } catch (error) {
       console.error(error)
-      res.status(500).json({ success: false, message: error.message })
+      return res.status(500).json({ success: false, message: error.message })
     }
   }
 
@@ -82,7 +85,6 @@ class GameController {
 
   // --> buscar un juego por nombre
   async search(req, res) {
-
     const { q } = req.query
     const page = parseInt(req.query.page, 10) || 1
     const limit = parseInt(req.query.limit, 10) || 25

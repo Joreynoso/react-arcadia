@@ -35,25 +35,28 @@ class GameService {
     return allGames.length
   }
 
-  // --> genearr descripción con google gen ai
+  // --> generar descripción con google gen ai
   async generateSummary(id) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new Error("Id no valido")
     }
 
-    const game = await GameRepository.getById(id)
+    let game = await GameRepository.getById(id)
     if (!game) throw new Error("Juego no encontrado")
 
-    // Solo generamos si summary está vacío
+    // Si no tiene summary, generamos y actualizamos
     if (!game.summary) {
       const summary = await getSummaryFromAi({ name: game.name, released: game.released })
       if (summary) {
-        return GameRepository.updateSummary(id, summary)
+        game = await GameRepository.updateSummary(id, summary)
       }
     }
 
-    // Si ya tiene summary, devolvemos el juego tal cual
-    return game
+    // devolvemos solo name y summary
+    return {
+      name: game.name,
+      summary: game.summary,
+    }
   }
 
   // --> mostrar la lista de juegos
