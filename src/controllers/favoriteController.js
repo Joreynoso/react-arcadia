@@ -28,7 +28,6 @@ class FavoriteController {
         })
       }
 
-      // agregar el favorito
       const game = await FavoriteService.createFavorite(req.user.id, gameId)
       res.status(201).json({
         success: true,
@@ -43,9 +42,6 @@ class FavoriteController {
   async removeFavorite(req, res) {
     try {
       const { gameId } = req.body
-      if (!gameId)
-        return res.status(400).json({ success: false, message: "El campo gameId es obligatorio" })
-
       const game = await FavoriteService.deleteFavorite(req.user.id, gameId)
       res.status(200).json({
         success: true,

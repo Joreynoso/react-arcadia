@@ -23,10 +23,8 @@ class FavoriteGameService {
     return favorites.map((fav) => this.formatGame(fav))
   }
 
+  // crea un favorito, **no lanza error si ya existe**
   async createFavorite(userId, gameId) {
-    const exists = await FavoriteRepository.findFavorite(userId, gameId)
-    if (exists) throw new Error("El juego ya está en favoritos")
-
     const newFav = await FavoriteRepository.addFavorite(userId, gameId)
     await newFav.populate("game")
     return this.formatGame(newFav)
