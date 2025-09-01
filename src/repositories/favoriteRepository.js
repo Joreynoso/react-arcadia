@@ -2,18 +2,6 @@ import FavoriteGame from "../models/FavoriteGame.js"
 
 class FavoriteGameRepository {
 
-    async addFavorite(userId, gameId) {
-        return FavoriteGame.create({ user: userId, game: gameId })
-    }
-
-    async removeFavorite(userId, gameId) {
-        return FavoriteGame.findOneAndDelete({ user: userId, game: gameId })
-    }
-
-    async existsFavorite(userId, gameId) {
-        return FavoriteGame.findOne({ user: userId, game: gameId })
-    }
-
     async getFavoritesByUser(userId) {
         return FavoriteGame.find({ user: userId }).populate({
             path: 'game',
@@ -21,8 +9,16 @@ class FavoriteGameRepository {
         })
     }
 
-    async getFavorite(userId, gameId) {
+    async findFavorite(userId, gameId) {
         return FavoriteGame.findOne({ user: userId, game: gameId })
+    }
+
+    async addFavorite(userId, gameId) {
+        return FavoriteGame.create({ user: userId, game: gameId })
+    }
+
+    async removeFavorite(userId, gameId) {
+        return FavoriteGame.findOneAndDelete({ user: userId, game: gameId })
     }
 }
 
