@@ -120,7 +120,7 @@ class GameController {
       const gameExist = await gameService.getGameByName(name)
 
       if (gameExist) {
-        return res.status(400).json({ succes: false, message: "El juego ya existe" })
+        return res.status(200).json({ succes: false, message: "El juego ya existe" })
       }
 
       const newGame = await gameService.createGame(gameData)
