@@ -78,6 +78,10 @@ class GameService {
     return GameRepository.search(q, page, limit)
   }
 
+  async searchByReleased(page, limit, sort) {
+    return GameRepository.searchByReleased(page, limit, sort)
+  }
+
   // --> crear un nuevo juego
   async createGame(data) {
     // si viene id_rawg, verificamos si ya existe

@@ -31,6 +31,13 @@ gameRouter.get("/search",
     handleValidationError,
     gameController.search)
 
+gameRouter.get("/released",
+    authenticateToken,
+    hasPermission('read:games'),
+    searchValidator,
+    handleValidationError,
+    gameController.searchByReleased)
+
 gameRouter.get("/:id",
     authenticateToken,
     hasPermission('read:games'),

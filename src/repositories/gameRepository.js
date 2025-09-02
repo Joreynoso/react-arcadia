@@ -43,6 +43,19 @@ class GameRepository {
     return { games, total }
   }
 
+  async searchByReleased(page, limit, sort = "desc") {
+    const skip = (page - 1) * limit
+
+    const games = await VideoGame.find()
+      .sort({ released: sort === "desc" ? -1 : 1 }) // ordena por string ISO
+      .skip(skip)
+      .limit(limit)
+
+    const total = await VideoGame.countDocuments()
+
+    return { games, total }
+  }
+
   async create(data) {
     return VideoGame.create(data)
   }

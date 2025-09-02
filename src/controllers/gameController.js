@@ -111,6 +111,36 @@ class GameController {
     }
   }
 
+  // --> buscar juegos por fecha de lanzamiento
+  async searchByReleased(req, res) {
+    const page = parseInt(req.query.page, 10) || 1
+    const limit = parseInt(req.query.limit, 10) || 25
+    const sort = req.query.sort || "desc" // valor por defecto
+
+    try {
+      const { games, total } = await gameService.searchByReleased(page, limit, sort)
+
+      if (!games || games.length === 0) {
+        return res
+          .status(404)
+          .json({ succes: false, message: "No se encontraron juegos ordenados por fecha" })
+      }
+
+      res.status(200).json({
+        succes: true,
+        message: `Resultados de juegos ordenados por fecha (${sort})`,
+        page,
+        total,
+        totalPages: Math.ceil(total / limit),
+        count: games.length,
+        games,
+      })
+    } catch (error) {
+      console.error(error.message)
+      return res.status(500).json({ succes: false, message: error.message })
+    }
+  }
+
   // --> crear un nuevo juego
   async create(req, res) {
     try {
