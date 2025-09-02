@@ -48,5 +48,22 @@ export const searchValidator = [
     .toInt(),
 ]
 
+export const releasedValidator = [
+  query("sort")
+    .optional()
+    .isIn(["asc", "desc"])
+    .withMessage("El parámetro sort debe ser 'asc' o 'desc'")
+    .default("desc"),
 
+  query("page")
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage("La página debe ser un número entero mayor o igual a 1")
+    .toInt(),
 
+  query("limit")
+    .optional()
+    .isInt({ min: 1, max: 100 })
+    .withMessage("El límite debe ser un número entre 1 y 100")
+    .toInt(),
+]

@@ -2,7 +2,7 @@ import express from "express"
 import gameController from "../controllers/gameController.js"
 import { authenticateToken, hasPermission } from "../middlewares/authMiddleware.js"
 import { handleValidationError } from "../middlewares/handleValidationsError.js"
-import { gameValidator, paginationValidator, searchValidator } from "../validations/videogameValidator.js"
+import { gameValidator, paginationValidator, searchValidator, releasedValidator } from "../validations/videogameValidator.js"
 
 // instanciar router
 const gameRouter = express.Router()
@@ -34,7 +34,7 @@ gameRouter.get("/search",
 gameRouter.get("/released",
     authenticateToken,
     hasPermission('read:games'),
-    searchValidator,
+    releasedValidator,
     handleValidationError,
     gameController.searchByReleased)
 
