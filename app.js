@@ -16,14 +16,37 @@ dotenv.config()
 const app = express()
 const port = process.env.PORT
 
-// cors options
+// // cors options
+// const corsOptions = {
+//   origin: process.env.ALLOWED_ORIGINS?.split(",") || "*",
+//   methods: ["GET", "POST", "PUT", "DELETE"],
+//   allowedHeaders: ['Content-Type', 'Authorization'],
+//   exposedHeaders: ['Content-Range', 'X-Content-Range'],
+//   credentials: true,
+//   maxAge: 86400 // 24 horase en segundos
+// }
+
+// Lista de orígenes permitidos (Netlify + local para dev)
+const allowedOrigins = [
+  "https://phenomenal-kashata-0e60a4.netlify.app", // tu frontend Netlify
+  "http://localhost:5173" // si usas Vite/React dev server
+]
+
 const corsOptions = {
-  origin: process.env.ALLOWED_ORIGINS?.split(",") || "*",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['Content-Range', 'X-Content-Range'],
-  credentials: true,
-  maxAge: 86400 // 24 horase en segundos
+  origin: function (origin, callback) {
+    // permitir requests sin origin (Postman, curl)
+    if (!origin) return callback(null, true)
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error("CORS policy: Origin not allowed"))
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  exposedHeaders: ["Content-Range", "X-Content-Range"],
+  credentials: true, // necesario si envías cookies o auth headers
+  maxAge: 86400 // 24 horas en segundos
 }
 
 // Middleware para parsear cuerpos JSON
