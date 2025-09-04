@@ -28,7 +28,7 @@ const port = process.env.PORT
 
 // Lista de orígenes permitidos (Netlify + local para dev)
 const allowedOrigins = [
-  "https://phenomenal-kashata-0e60a4.netlify.app", // tu frontend Netlify
+  "https://arcadia-front.netlify.app/", // tu frontend Netlify
   "http://localhost:5173" // si usas Vite/React dev server
 ]
 
