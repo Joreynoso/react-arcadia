@@ -74,10 +74,17 @@ class GameService {
     return game
   }
 
+  // --> buscar un juego por nombre exacto
+  async getGameByName(name) {
+    return GameRepository.getByName(name)
+  }
+
+  // --> buscar por nombre
   async searchGames(q, page, limit) {
     return GameRepository.search(q, page, limit)
   }
 
+  // --> buscar por fecha desc, asc
   async searchByReleased(page, limit, sort) {
     return GameRepository.searchByReleased(page, limit, sort)
   }

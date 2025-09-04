@@ -30,6 +30,10 @@ class GameRepository {
     return VideoGame.findOne({ id_rawg })
   }
 
+  async getByName(name) {
+    return VideoGame.findOne({ name: name })
+  }
+
   async search(q, page, limit) {
     const skip = (page - 1) * limit
 
@@ -61,6 +65,9 @@ class GameRepository {
   }
 
   async update(id, data) {
+    // siempre resetear summary
+    data.summary = ""
+
     return VideoGame.findByIdAndUpdate(id, data, { new: true })
   }
 
