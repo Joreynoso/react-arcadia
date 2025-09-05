@@ -8,6 +8,8 @@ class FavoriteGameRepository {
     })
   }
 
+  
+
   async existsFavorite(userId, gameId) {
     const fav = await FavoriteGame.findOne({ user: userId, game: gameId })
     return !!fav // true si existe, false si no

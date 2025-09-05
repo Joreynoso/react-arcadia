@@ -20,7 +20,9 @@ class FavoriteGameService {
 
   async listFavorites(userId) {
     const favorites = await FavoriteRepository.getFavoritesByUser(userId)
-    return favorites.map((fav) => this.formatGame(fav))
+    return favorites
+      .filter((fav) => fav.game) // ignorar si game es null
+      .map((fav) => this.formatGame(fav))
   }
 
   // crea un favorito, **no lanza error si ya existe**

@@ -8,6 +8,12 @@ class FavoriteController {
       }
 
       const favorites = (await FavoriteService.listFavorites(req.user.id)) || []
+
+      if (!favorites || favorites.length === 0) {
+        return res
+          .status(200)
+          .json({ success: false, message: "No hay favoritos aun", favorites: [] })
+      }
       res.status(200).json({
         success: true,
         favorites,
