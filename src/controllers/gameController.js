@@ -1,4 +1,5 @@
 import gameService from "../services/gameService.js"
+import FavoriteGame from "../models/FavoriteGame.js"
 
 class GameController {
   constructor() {}
@@ -192,6 +193,8 @@ class GameController {
       if (!gameDeleted) {
         return res.status(404).json({ succes: false, message: "Juego no encontrado" })
       }
+
+      await FavoriteGame.deleteMany({ game: id })
 
       res.status(200).json({ succes: true, message: "Juego eliminado", game: gameDeleted })
     } catch (error) {
