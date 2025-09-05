@@ -3,14 +3,13 @@ import FavoriteService from "../services/favoriteService.js"
 class FavoriteController {
   async getFavorites(req, res) {
     try {
-      if (!req.user) {
+      if (!req.user?.id) {
         return res.status(401).json({ success: false, message: "Usuario no autenticado" })
       }
 
       const favorites = (await FavoriteService.listFavorites(req.user.id)) || []
       res.status(200).json({
         success: true,
-        message: favorites.length ? "Lista de favoritos" : "No se encontraron favoritos",
         favorites,
       })
     } catch (err) {
