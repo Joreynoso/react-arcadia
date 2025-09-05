@@ -3,7 +3,7 @@ import FavoriteService from "../services/favoriteService.js"
 class FavoriteController {
   async getFavorites(req, res) {
     try {
-      const favorites = await FavoriteService.listFavorites(req.user.id)
+      const favorites = (await FavoriteService.listFavorites(req.user.id)) || []
       res.status(200).json({
         success: true,
         message: favorites.length ? "Lista de favoritos" : "No se encontraron favoritos",
