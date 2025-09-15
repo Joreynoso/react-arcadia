@@ -1,8 +1,9 @@
 import gameService from "../services/gameService.js"
 import FavoriteGame from "../models/FavoriteGame.js"
+import { query } from 'express-validator'
 
 class GameController {
-  constructor() {}
+  constructor() { }
 
   // --> cargar todos los juegos
   async loadGames(req, res) {
@@ -141,6 +142,42 @@ class GameController {
       return res.status(500).json({ succes: false, message: error.message })
     }
   }
+
+  // --> buscar juegos por género
+  async searchByGenre(req, res) {
+    const { genre } = req.query   // ej: ?genre=Action
+    const page = parseInt(req.query.page, 10) || 1
+    const limit = parseInt(req.query.limit, 10) || 25
+
+    try {
+      const { games, total } = await gameService.searchByGender(page, limit, genre)
+
+      if (!games || games.length === 0) {
+        return res.status(404).json({
+          succes: false,
+          message: "No se encontraron juegos"
+        })
+      }
+
+      res.status(200).json({
+        succes: true,
+        message: genre ? `Resultados de búsqueda para género "${genre}"` : "Lista de juegos",
+        page,
+        total,
+        totalPages: Math.ceil(total / limit),
+        count: games.length,
+        games,
+      })
+
+    } catch (error) {
+      console.error(error.message)
+      return res.status(500).json({
+        succes: false,
+        message: error.message
+      })
+    }
+  }
+
 
   // --> crear un nuevo juego
   async create(req, res) {

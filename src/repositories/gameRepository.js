@@ -74,6 +74,24 @@ class GameRepository {
   async delete(id) {
     return VideoGame.findByIdAndDelete(id)
   }
+
+  async searchByGender(page, limit, genre) {
+    const skip = (page - 1) * limit
+
+    const query = {}
+
+    if (genre) {
+      query.genres = genre // filtrar solo un genero
+    }
+
+    const games = await VideoGame.find(query)
+      .skip(skip)
+      .limit(limit)
+
+    const total = await VideoGame.countDocuments(query)
+
+    return { games, total }
+  }
 }
 
 export default new GameRepository()
