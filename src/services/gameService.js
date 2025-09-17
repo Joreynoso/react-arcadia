@@ -105,7 +105,7 @@ class GameService {
   }
 
   // --> buscar un juego por genero
-  async searchByGender(page, limit, platform) {
+  async searchByPlatform(page, limit, platform) {
     return GameRepository.searchByPlatform(page, limit, platform)
   }
 
