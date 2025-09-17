@@ -38,12 +38,12 @@ gameRouter.get("/released",
     handleValidationError,
     gameController.searchByReleased)
 
-gameRouter.get("/genres",
+gameRouter.get("/genre",
     authenticateToken,
     hasPermission('read:games'),
     gameController.searchByGenre)
 
-gameRouter.get("/platforms",
+gameRouter.get("/platform",
     authenticateToken,
     hasPermission('read:games'),
     gameController.searchByPlatform)
