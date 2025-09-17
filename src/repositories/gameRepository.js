@@ -102,6 +102,24 @@ class GameRepository {
 
     return { games, total }
   }
+
+  async searchByPlatform(page, limit, platform) {
+    const skip = (page - 1) * limit
+
+    const query = {}
+
+    if (platform) {
+      query.platforms = platform // filtrar solo un genero
+    }
+
+    const games = await VideoGame.find(query)
+      .skip(skip)
+      .limit(limit)
+
+    const total = await VideoGame.countDocuments(query)
+
+    return { games, total }
+  }
 }
 
 export default new GameRepository()

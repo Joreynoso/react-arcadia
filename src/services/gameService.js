@@ -104,6 +104,11 @@ class GameService {
     return GameRepository.searchByGender(page, limit, genre)
   }
 
+  // --> buscar un juego por genero
+  async searchByGender(page, limit, platform) {
+    return GameRepository.searchByPlatform(page, limit, platform)
+  }
+
   // --> crear un nuevo juego
   async createGame(data) {
     // si viene id_rawg, verificamos si ya existe

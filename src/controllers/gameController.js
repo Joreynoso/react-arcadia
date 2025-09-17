@@ -211,6 +211,40 @@ class GameController {
     }
   }
 
+  // --> buscar juegos por plataforma
+  async searchByPlatform(req, res) {
+    const { platform } = req.query
+    const page = parseInt(req.query.page, 10) || 1
+    const limit = parseInt(req.query.limit, 10) || 25
+
+    try {
+      const { games, total } = await gameService.searchByPlatform(page, limit, platform)
+
+      if (!games || games.length === 0) {
+        return res.status(404).json({
+          succes: false,
+          message: "No se encontraron juegos"
+        })
+      }
+
+      res.status(200).json({
+        succes: true,
+        message: genre ? `Resultados de búsqueda para plataforma "${platform}"` : "Lista de juegos",
+        page,
+        total,
+        totalPages: Math.ceil(total / limit),
+        count: games.length,
+        games,
+      })
+
+    } catch (error) {
+      console.error(error.message)
+      return res.status(500).json({
+        succes: false,
+        message: error.message
+      })
+    }
+  }
 
   // --> crear un nuevo juego
   async create(req, res) {

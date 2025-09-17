@@ -43,6 +43,11 @@ gameRouter.get("/genres",
     hasPermission('read:games'),
     gameController.searchByGenre)
 
+gameRouter.get("/platforms",
+    authenticateToken,
+    hasPermission('read:games'),
+    gameController.searchByPlatform)
+
 gameRouter.get("/all-platforms",
     authenticateToken,
     hasPermission('read:games'),
