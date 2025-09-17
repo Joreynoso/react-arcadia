@@ -85,7 +85,7 @@ class GameController {
   }
 
   // --> lista de plataformas
-  async getAllGenres(req, res) {
+  async getAllPlatforms(req, res) {
     try {
       const totalPlatforms = await gameService.getAllPlatforms()
 
