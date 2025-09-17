@@ -229,7 +229,7 @@ class GameController {
 
       res.status(200).json({
         succes: true,
-        message: genre ? `Resultados de búsqueda para plataforma "${platform}"` : "Lista de juegos",
+        message: platform ? `Resultados de búsqueda para plataforma "${platform}"` : "Lista de juegos",
         page,
         total,
         totalPages: Math.ceil(total / limit),
