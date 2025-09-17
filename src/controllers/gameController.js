@@ -1,6 +1,7 @@
 import gameService from "../services/gameService.js"
 import FavoriteGame from "../models/FavoriteGame.js"
 import { query } from 'express-validator'
+import VideoGame from '../models/VideoGame.js'
 
 class GameController {
   constructor() { }
@@ -61,6 +62,38 @@ class GameController {
         count: games.length,
         games,
       })
+    } catch (error) {
+      console.error(error.message)
+      return res.status(500).json({ succes: false, message: error.message })
+    }
+  }
+
+  // --> lista de generos
+  async getAllGenres(req, res) {
+    try {
+      const totalGenres = await gameService.getAllGenres()
+
+      if (totalGenres.length === 0 || !totalGenres) {
+        return res.status(404).json({ succes: false, message: "No hay generos" })
+      }
+
+      return res.status(200).json({ succes: true, totalGenres })
+    } catch (error) {
+      console.error(error.message)
+      return res.status(500).json({ succes: false, message: error.message })
+    }
+  }
+
+  // --> lista de plataformas
+  async getAllGenres(req, res) {
+    try {
+      const totalPlatforms = await gameService.getAllPlatforms()
+
+      if (totalPlatforms.length === 0 || !totalPlatforms) {
+        return res.status(404).json({ succes: false, message: "No hay generos" })
+      }
+
+      return res.status(200).json({ succes: true, totalPlatforms })
     } catch (error) {
       console.error(error.message)
       return res.status(500).json({ succes: false, message: error.message })

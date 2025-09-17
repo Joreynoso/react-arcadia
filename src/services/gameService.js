@@ -64,6 +64,16 @@ class GameService {
     return GameRepository.getAll(page, limit)
   }
 
+  // --> mostrar la lista de generos
+  async getAllGenres() {
+    return GameRepository.getAllGenres()
+  }
+
+  // --> mostrar la lista de plataformas
+  async getAllPlatforms() {
+    return GameRepository.getAllPlatforms()
+  }
+
   // --> buscar un juego por id
   async getGameById(id) {
     if (!mongoose.Types.ObjectId.isValid(id)) {

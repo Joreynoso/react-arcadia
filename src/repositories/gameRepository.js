@@ -22,6 +22,16 @@ class GameRepository {
     return { games, total }
   }
 
+  async getAllGenres() {
+    const totalGenres = await VideoGame.distinct('genres')
+    return totalGenres
+  }
+
+  async getAllPlatforms() {
+    const totalPlatforms = await VideoGame.distinct('platforms')
+    return totalPlatforms
+  }
+
   async getById(id) {
     return VideoGame.findById(id)
   }
