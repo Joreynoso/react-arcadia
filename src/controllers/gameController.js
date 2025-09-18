@@ -1,10 +1,10 @@
 import gameService from "../services/gameService.js"
 import FavoriteGame from "../models/FavoriteGame.js"
-import { query } from 'express-validator'
-import VideoGame from '../models/VideoGame.js'
+import { query } from "express-validator"
+import VideoGame from "../models/VideoGame.js"
 
 class GameController {
-  constructor() { }
+  constructor() {}
 
   // --> cargar todos los juegos
   async loadGames(req, res) {
@@ -45,26 +45,50 @@ class GameController {
   // --> lista de juegos
   async getAll(req, res) {
     try {
-      const { page = 1, limit = 10 } = req.query // valores por defecto
+      // 1️⃣ Extraemos los query params de la URL (ej: /api/games?page=2&genre=Action)
+      //    Si no vienen, asignamos valores por defecto.
+      const { page = 1, limit = 20, genre, platform, sort = "desc" } = req.query
 
-      const { games, total } = await gameService.getAllGames(page, limit)
+      // 2️⃣ Llamamos al servicio, que construye los filtros, orden y paginación
+      //    Convertimos page y limit a número porque req.query los trae como string.
+      const { games, total } = await gameService.getAllGames({
+        page: parseInt(page, 10),
+        limit: parseInt(limit, 10),
+        genre,
+        platform,
+        sort,
+      })
 
+      // 3️⃣ Si no se encontraron juegos, devolvemos un 404
       if (!games || games.length === 0) {
-        return res.status(404).json({ succes: false, message: "No hay juegos" })
+        return res.status(404).json({
+          success: false,
+          message: "No se encontraron juegos",
+        })
       }
 
-      res.status(200).json({
-        succes: true,
+      // 4️⃣ Si hay resultados, devolvemos:
+      //    - success → para indicar que salió bien
+      //    - page → página actual
+      //    - total → cantidad total de juegos
+      //    - totalPages → número total de páginas (total / limit redondeado hacia arriba)
+      //    - count → cuántos juegos trae esta página
+      //    - games → el array con los juegos
+      return res.status(200).json({
+        success: true,
         message: "Lista de juegos",
-        page: Number(page), // --> pág actual convertida a num
-        total, // --> total juegos
-        totalPages: Math.ceil(total / limit), // --> total juegos posibles x pág
+        page: Number(page),
+        total,
+        totalPages: Math.ceil(total / limit),
         count: games.length,
         games,
       })
     } catch (error) {
       console.error(error.message)
-      return res.status(500).json({ succes: false, message: error.message })
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      })
     }
   }
 
@@ -143,106 +167,6 @@ class GameController {
     } catch (error) {
       console.error(error.message)
       return res.status(500).json({ succes: false, message: error.message })
-    }
-  }
-
-  // --> buscar juegos por fecha de lanzamiento
-  async searchByReleased(req, res) {
-    const page = parseInt(req.query.page, 10) || 1
-    const limit = parseInt(req.query.limit, 10) || 25
-    const sort = req.query.sort || "desc" // valor por defecto
-
-    try {
-      const { games, total } = await gameService.searchByReleased(page, limit, sort)
-
-      if (!games || games.length === 0) {
-        return res
-          .status(404)
-          .json({ succes: false, message: "No se encontraron juegos ordenados por fecha" })
-      }
-
-      res.status(200).json({
-        succes: true,
-        message: `Resultados de juegos ordenados por fecha (${sort})`,
-        page,
-        total,
-        totalPages: Math.ceil(total / limit),
-        count: games.length,
-        games,
-      })
-    } catch (error) {
-      console.error(error.message)
-      return res.status(500).json({ succes: false, message: error.message })
-    }
-  }
-
-  // --> buscar juegos por género
-  async searchByGenre(req, res) {
-    const { genre } = req.query   // ej: ?genre=Action
-    const page = parseInt(req.query.page, 10) || 1
-    const limit = parseInt(req.query.limit, 10) || 25
-
-    try {
-      const { games, total } = await gameService.searchByGender(page, limit, genre)
-
-      if (!games || games.length === 0) {
-        return res.status(404).json({
-          succes: false,
-          message: "No se encontraron juegos"
-        })
-      }
-
-      res.status(200).json({
-        succes: true,
-        message: genre ? `Resultados de búsqueda para género "${genre}"` : "Lista de juegos",
-        page,
-        total,
-        totalPages: Math.ceil(total / limit),
-        count: games.length,
-        games,
-      })
-
-    } catch (error) {
-      console.error(error.message)
-      return res.status(500).json({
-        succes: false,
-        message: error.message
-      })
-    }
-  }
-
-  // --> buscar juegos por plataforma
-  async searchByPlatform(req, res) {
-    const { platform } = req.query
-    const page = parseInt(req.query.page, 10) || 1
-    const limit = parseInt(req.query.limit, 10) || 25
-
-    try {
-      const { games, total } = await gameService.searchByPlatform(page, limit, platform)
-
-      if (!games || games.length === 0) {
-        return res.status(404).json({
-          succes: false,
-          message: "No se encontraron juegos"
-        })
-      }
-
-      res.status(200).json({
-        succes: true,
-        message: platform ? `Resultados de búsqueda para plataforma "${platform}"` : "Lista de juegos",
-        page,
-        total,
-        totalPages: Math.ceil(total / limit),
-        count: games.length,
-        games,
-      })
-
-    } catch (error) {
-      console.error(error.message)
-      return res.status(500).json({
-        succes: false,
-        message: error.message
-      })
     }
   }
 
