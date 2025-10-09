@@ -45,12 +45,14 @@ class GameController {
   // --> lista de juegos
   async getAll(req, res) {
     try {
-      // 1️⃣ Extraemos los query params de la URL (ej: /api/games?page=2&genre=Action)
-      //    Si no vienen, asignamos valores por defecto.
       const { page = 1, limit = 20, genre, platform, sort = "desc" } = req.query
 
-      // 2️⃣ Llamamos al servicio, que construye los filtros, orden y paginación
-      //    Convertimos page y limit a número porque req.query los trae como string.
+      console.log("query params: page", page)
+      console.log("query params: genre", genre)
+      console.log("query params: limite", limit)
+      console.log("query params: platfrom", platform)
+      console.log("query params: sort", sort)
+
       const { games, total } = await gameService.getAllGames({
         page: parseInt(page, 10),
         limit: parseInt(limit, 10),
@@ -59,7 +61,6 @@ class GameController {
         sort,
       })
 
-      // 3️⃣ Si no se encontraron juegos, devolvemos un 404
       if (!games || games.length === 0) {
         return res.status(404).json({
           success: false,
@@ -67,13 +68,8 @@ class GameController {
         })
       }
 
-      // 4️⃣ Si hay resultados, devolvemos:
-      //    - success → para indicar que salió bien
-      //    - page → página actual
-      //    - total → cantidad total de juegos
-      //    - totalPages → número total de páginas (total / limit redondeado hacia arriba)
-      //    - count → cuántos juegos trae esta página
-      //    - games → el array con los juegos
+      console.log("games sorting, filter by:", query.params)
+
       return res.status(200).json({
         success: true,
         message: "Lista de juegos",
