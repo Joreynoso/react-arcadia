@@ -69,7 +69,7 @@ class GameService {
     if (platform) filter.platform = platform
 
     // búsqueda por nombre (regex, insensible a mayúsculas)
-    if (q) filter.title = { $regex: q, $options: "i" }
+    if (q) filter.name = { $regex: q, $options: "i" }
 
     const sortOption = {}
     if (sort === "asc") sortOption.released = 1
