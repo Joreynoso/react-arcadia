@@ -60,23 +60,21 @@ class GameService {
   }
 
   // --> mostrar la lista de juegos
-  async getAllGames({ page = 1, limit = 20, genre, platform, sort = "desc" }) {
+  async getAllGames({ page = 1, limit = 20, genre, platform, sort = "desc", q }) {
     const skip = (page - 1) * limit
-
-    // Armamos el filtro vacío, si no hay querys no filtramos nada
     const filter = {}
-    // Si viene un género en el query, lo agregamos al filtro o plataforma
-    if (genre) filter.genres = genre
-    if (platform) filter.platforms = platform
 
-    // Armamos la opción de ordenamiento
-    // released: -1 → descendente (más nuevos primero)
-    // released: 1 → ascendente (más viejos primero)
+    // filtros dinámicos
+    if (genre) filter.genre = genre
+    if (platform) filter.platform = platform
+
+    // búsqueda por nombre (regex, insensible a mayúsculas)
+    if (q) filter.title = { $regex: q, $options: "i" }
+
     const sortOption = {}
     if (sort === "asc") sortOption.released = 1
     if (sort === "desc") sortOption.released = -1
 
-    // Pedimos al repositorio los juegos con este filtro
     return GameRepository.getAll({ filter, sortOption, skip, limit })
   }
 

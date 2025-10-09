@@ -45,13 +45,7 @@ class GameController {
   // --> lista de juegos
   async getAll(req, res) {
     try {
-      const { page = 1, limit = 20, genre, platform, sort = "desc" } = req.query
-
-      console.log("query params: page", page)
-      console.log("query params: genre", genre)
-      console.log("query params: limite", limit)
-      console.log("query params: platfrom", platform)
-      console.log("query params: sort", sort)
+      const { page = 1, limit = 20, genre, platform, sort = "desc", q } = req.query
 
       const { games, total } = await gameService.getAllGames({
         page: parseInt(page, 10),
@@ -59,16 +53,15 @@ class GameController {
         genre,
         platform,
         sort,
+        q
       })
 
-      if (!games || games.length === 0) {
+      if (!games.length) {
         return res.status(404).json({
           success: false,
-          message: "No se encontraron juegos",
+          message: "No se encontraron juegos"
         })
       }
-
-      console.log("games sorting, filter by:", query.params)
 
       return res.status(200).json({
         success: true,
@@ -77,13 +70,13 @@ class GameController {
         total,
         totalPages: Math.ceil(total / limit),
         count: games.length,
-        games,
+        games
       })
     } catch (error) {
-      console.error(error.message)
-      return res.status(500).json({
+      console.error("❌ Error en getAll:", error.message)
+      res.status(500).json({
         success: false,
-        message: error.message,
+        message: error.message
       })
     }
   }

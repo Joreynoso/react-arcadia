@@ -15,7 +15,6 @@ class GameRepository {
 
   async getAll({ filter = {}, sortOption = {}, skip = 0, limit = 20 }) {
     const games = await VideoGame.find(filter).sort(sortOption).skip(skip).limit(limit)
-
     const total = await VideoGame.countDocuments(filter)
 
     return { games, total }
