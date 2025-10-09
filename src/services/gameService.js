@@ -65,8 +65,8 @@ class GameService {
     const filter = {}
 
     // filtros dinámicos
-    if (genre) filter.genre = genre
-    if (platform) filter.platform = platform
+    if (genre) filter.genres = { $in: [genre] }
+    if (platform) filter.platforms = { $in: [platform] }
 
     // búsqueda por nombre (regex, insensible a mayúsculas)
     if (q) filter.name = { $regex: q, $options: "i" }
