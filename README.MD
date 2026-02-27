@@ -66,7 +66,7 @@ El backend sigue una estructura modular:
 El proyecto requiere las siguientes variables:
 
 ```env
-GEMINI_API_KEY=
+GROQ_API_KEY=
 RAWG_API_KEY=
 JWT_SECRET=
 MONGO_URI=
