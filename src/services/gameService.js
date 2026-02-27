@@ -60,8 +60,22 @@ class GameService {
   }
 
   // --> mostrar la lista de juegos
-  async getAllGames(page, limit) {
-    return GameRepository.getAll(page, limit)
+  async getAllGames({ page = 1, limit = 20, genre, platform, sort = "desc", q }) {
+    const skip = (page - 1) * limit
+    const filter = {}
+
+    // filtros dinámicos
+    if (genre) filter.genres = { $in: [genre] }
+    if (platform) filter.platforms = { $in: [platform] }
+
+    // búsqueda por nombre (regex, insensible a mayúsculas)
+    if (q) filter.name = { $regex: q, $options: "i" }
+
+    const sortOption = {}
+    if (sort === "asc") sortOption.released = 1
+    if (sort === "desc") sortOption.released = -1
+
+    return GameRepository.getAll({ filter, sortOption, skip, limit })
   }
 
   // --> mostrar la lista de generos
@@ -92,21 +106,6 @@ class GameService {
   // --> buscar por nombre
   async searchGames(q, page, limit) {
     return GameRepository.search(q, page, limit)
-  }
-
-  // --> buscar por fecha desc, asc
-  async searchByReleased(page, limit, sort) {
-    return GameRepository.searchByReleased(page, limit, sort)
-  }
-
-  // --> buscar un juego por genero
-  async searchByGender(page, limit, genre) {
-    return GameRepository.searchByGender(page, limit, genre)
-  }
-
-  // --> buscar un juego por genero
-  async searchByPlatform(page, limit, platform) {
-    return GameRepository.searchByPlatform(page, limit, platform)
   }
 
   // --> crear un nuevo juego
